@@ -31,7 +31,7 @@
 #define COLOR_GREEN_LTGRAY_BACKGROUND       7
 #define COLOR_BLUE_LTGRAY_BACKGROUND        8
 #define COLOR_WHITE_LTGRAY_BACKGROUND       9
-#define COLOR_BLACK_LTGRAY_BACKGROUND      10
+#define COLOR_BLACK_LTGRAY_BACKGROUND       10
 
 #define COLOR_RED_GRAY_BACKGROUND           11
 #define COLOR_GREEN_GRAY_BACKGROUND         12
@@ -41,6 +41,7 @@
 
 
 #define MAX_USERNAME_LENGTH                 32
+#define MAX_DATE_LENGTH                     20
 
 
 
@@ -60,5 +61,3 @@ struct Position
     int row;
     int col;
 };
-
-

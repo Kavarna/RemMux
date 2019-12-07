@@ -3,6 +3,14 @@ project(RemMux)
 
 set(CMAKE_CXX_STANDARD 17)
 
+if (CMAKE_BUILD_TYPE MATCHES DEBUG)
+    add_definitions(-DDEBUG)
+    set(COMPILE_CONFIGURATION "debug")
+elseif (CMAKE_BUILD_TYPE MATCHES RELEASE)
+	set(COMPILE_CONFIGURATION "release")
+endif()
+
+
 include_directories(include)
 
 find_package(Curses REQUIRED)

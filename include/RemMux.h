@@ -2,7 +2,6 @@
 
 
 #include "Common.h"
-#include "IResizeable.h"
 #include "UIHeader.h"
 
 class RemMux
@@ -40,6 +39,8 @@ private:
 private:
     HighResolutionTimer         m_timer;
     float                       m_deltaTime;
+
+    std::unique_ptr<UIHeader>   m_header;
 
 };
 

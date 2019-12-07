@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cmake -H. -BBin
+cmake -H. -BBin -DCMAKE_BUILD_TYPE=DEBUG
 
 cmake --build Bin
 

@@ -26,6 +26,15 @@ void RemMux::resize()
     endwin();
     refresh();
     clear();
+
+    uint32_t rows, cols;
+    getmaxyx(stdscr, rows, cols);
+
+    // mvprintw(0, 0, "COLS = %d, LINES = %d", COLS, LINES);
+    // for (int i = 0; i < COLS; i++)
+    //     mvaddch(1, i, '*');
+    
+    m_header.reset(new UIHeader(3, cols));
 }
 
 
@@ -35,6 +44,7 @@ RemMux::RemMux()
     initCurses();
     initColors();
     initComponents();
+    resize();
 }
 
 
@@ -134,5 +144,5 @@ void RemMux::getUserInput()
 
 void RemMux::present()
 {
-    mvwprintw(stdscr, 0, 0, "Framerate = %d", m_timer.getPeriodCount());
+    m_header->render();
 }

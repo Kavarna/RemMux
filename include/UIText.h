@@ -15,7 +15,7 @@ public:
     virtual void render(WINDOW*) override;
 
 public:
-    bool setText(std::string& text);
+    void setText(const std::string& text);
     const std::string& getText() const;
     void setMaxLength(uint32_t maxLength);
     uint32_t getMaxLength() const;
@@ -27,7 +27,6 @@ private:
 
 private:
     Position    m_textPosition;
-    bool        m_shouldRender;
     uint32_t    m_maxLength;
     std::string m_text;
 };
