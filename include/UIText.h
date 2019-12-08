@@ -12,7 +12,7 @@ public:
     ~UIText();
 
 public:
-    virtual void render(WINDOW*) override;
+    virtual void render(WINDOW*) const override;
 
 public:
     void setText(const std::string& text);

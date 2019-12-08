@@ -22,7 +22,7 @@ void UIText::create(const std::string& text, const Position& position, uint32_t 
     m_maxLength     = maxLength;
 }
 
-void UIText::render(WINDOW* win)
+void UIText::render(WINDOW* win) const 
 {
     mvwprintw(win, m_textPosition.row, m_textPosition.col, "%s", m_text.c_str());
 }

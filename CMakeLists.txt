@@ -21,6 +21,7 @@ add_executable(RemMux
         src/RemMux.cpp
         src/UIHeader.cpp
         src/UIText.cpp
+        src/Logger.cpp
         src/main.cpp)
 
 target_link_libraries(RemMux ${CURSES_LIBRARIES})

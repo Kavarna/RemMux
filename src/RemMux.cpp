@@ -1,4 +1,5 @@
 #include "RemMux.h"
+#include "Logger.h"
 
 
 RemMux* RemMux::m_instance = nullptr;
@@ -18,7 +19,8 @@ void RemMux::signalHandler(int signal)
 {
     if (signal == SIGWINCH)
     {
-        RemMux::Get()->resize();
+        RemMux::Get()->schedule(FLAG_RESIZE);
+        Logger::log("Resize scheduled\n");
     }
 }
 void RemMux::resize()
@@ -29,12 +31,10 @@ void RemMux::resize()
 
     uint32_t rows, cols;
     getmaxyx(stdscr, rows, cols);
+    Logger::log("Handling resize. New size = (", rows, ", ", cols, ")\n");
+    solve(FLAG_RESIZE);
 
-    // mvprintw(0, 0, "COLS = %d, LINES = %d", COLS, LINES);
-    // for (int i = 0; i < COLS; i++)
-    //     mvaddch(1, i, '*');
-    
-    m_header.reset(new UIHeader(3, cols));
+    m_header->resize(3, cols);
 }
 
 
@@ -100,7 +100,7 @@ void RemMux::initColors()
     start_color();
 
     init_color(COLOR_LTGRAY, 750, 750, 750);
-    init_color(COLOR_GRAY, 500, 500, 500);
+    init_color(COLOR_GRAY, 450, 450, 450);
 
     init_pair(1, COLOR_RED,     COLOR_BLACK);
     init_pair(2, COLOR_GREEN,   COLOR_BLACK);
@@ -126,6 +126,8 @@ void RemMux::initColors()
 void RemMux::initComponents()
 {
     signal(SIGWINCH, RemMux::signalHandler);
+
+    m_header = std::make_unique<UIHeader>();
 }
 
 void RemMux::getUserInput()
@@ -138,11 +140,37 @@ void RemMux::getUserInput()
             break;
         if (ch == '\n')
             break;
-        mvwprintw(stdscr, 1, 0, "Pressed char = %c", ch);
+        for (int i = 1; i <= 9; ++i)
+        {
+            if (KEY_F(i) == ch)
+            {
+                m_header->setActiveInstance(i - 1);
+                break;
+            }
+        }
+        mvwprintw(stdscr, 3, 0, "Pressed char = %d;       ", ch);
     }
 }
 
 void RemMux::present()
 {
-    m_header->render();
+    if (isScheduled(FLAG_RESIZE))
+        resize();
+    
+    m_header->render(m_timer.getPeriodCount());
+}
+
+void RemMux::schedule(uint32_t flag)
+{
+    m_flags |= (1ul << flag);
+}
+
+bool RemMux::isScheduled(uint32_t flag)
+{
+    return m_flags & (1ul << flag);
+}
+
+void RemMux::solve(uint32_t flag)
+{
+    m_flags &= ~(1ul << flag); 
 }

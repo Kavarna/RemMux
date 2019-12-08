@@ -12,6 +12,7 @@
 // C++ std
 #include <vector>
 #include <string>
+#include <cmath>
 
 // Others
 #include "HighResolutionTimer.h"
@@ -40,9 +41,17 @@
 #define COLOR_BLACK_GRAY_BACKGROUND         15
 
 
-#define MAX_USERNAME_LENGTH                 32
+#define MAX_USERNAME_LENGTH                 16
 #define MAX_DATE_LENGTH                     20
+#define MAX_INSTANCE_NAME                   8
+#define MAX_FRAMERATE_LENGTH                2
 
+
+#define FLAG_RESIZE                         0
+
+#ifndef CTRL
+#define CTRL(c) ((c) & 037)
+#endif
 
 
 #define THROW_ERROR(...) {char message[1024];\

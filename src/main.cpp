@@ -1,17 +1,19 @@
 #include "RemMux.h"
-#include <iostream>
-
+#include "Logger.h"
 
 int main(int argc, const char *argv[])
 {
 	try
 	{
+		Logger::initLogger();
 		RemMux::Get()->run(argc, argv);
 		RemMux::Destroy();
+		Logger::closeLogger();
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << e.what() << '\n';
+		Logger::log("Fatal error: ", e.what());
+		Logger::closeLogger();
 		return 1;
 	}
 
