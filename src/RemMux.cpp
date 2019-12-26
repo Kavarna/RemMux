@@ -38,9 +38,9 @@ void RemMux::resize()
 }
 
 
-
 RemMux::RemMux()
-{   
+{
+    Logger::log("App started.\n");
     initCurses();
     initColors();
     initComponents();
@@ -88,7 +88,6 @@ void RemMux::initCurses()
 {
     initscr();
 
-    // raw();
     keypad(stdscr, TRUE);
     noecho();
     nodelay(stdscr, TRUE);
@@ -113,13 +112,13 @@ void RemMux::initColors()
     init_pair(7, COLOR_GREEN,   COLOR_LTGRAY);
     init_pair(8, COLOR_BLUE,    COLOR_LTGRAY);
     init_pair(9, COLOR_WHITE,   COLOR_LTGRAY);
-    init_pair(10, COLOR_BLACK,   COLOR_LTGRAY);
+    init_pair(10, COLOR_BLACK,  COLOR_LTGRAY);
 
-    init_pair(11, COLOR_RED,     COLOR_GRAY);
+    init_pair(11, COLOR_RED,    COLOR_GRAY);
     init_pair(12, COLOR_GREEN,  COLOR_GRAY);
     init_pair(13, COLOR_BLUE,   COLOR_GRAY);
     init_pair(14, COLOR_WHITE,  COLOR_GRAY);
-    init_pair(15, COLOR_BLACK,   COLOR_GRAY);
+    init_pair(15, COLOR_BLACK,  COLOR_GRAY);
 }
 
 
@@ -144,8 +143,34 @@ void RemMux::getUserInput()
         {
             if (KEY_F(i) == ch)
             {
-                m_header->setActiveInstance(i - 1);
+                m_header->activateInstance(i);
+                Logger::log("F", i, " pressed.\n");
                 break;
+            }
+        }
+        if (ch == CTRL('x'))
+        { // Remove current instance
+            Logger::log("CTRL + x pressed. Deleting instance", "?", "\n");
+        }
+        else if (ch == CTRL('b'))
+        { // Enter window mode
+            Logger::log("CTRL + b pressed. Entering window mode.\n");
+            m_windowMode = true;
+        }
+        else if (ch == '\"')
+        {
+            if (m_windowMode)
+            {
+                Logger::log("Window mode enabled and \" pressed. Splitting current horizontally window\n");
+                m_windowMode = false;
+            }
+        }
+        else if (ch == '%')
+        {
+            if (m_windowMode)
+            {
+                Logger::log("Window mode enabled and \% pressed. Splitting current vertically window\n");
+                m_windowMode = false;
             }
         }
         mvwprintw(stdscr, 3, 0, "Pressed char = %d;       ", ch);

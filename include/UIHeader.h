@@ -14,15 +14,22 @@ public:
     void render(unsigned int);
     void resize(int rows, int cols);
 
-    void setActiveInstance(int index);
+    void activateInstance(int index);
+    void deleteInstance(int index);
+
+private:
+    void updateInstancesText(uint32_t, uint32_t);
 
 private:
     UIText                          m_framerate;
     UIText                          m_username;
     UIText                          m_time;
 
-    std::vector<UIText>             m_instancesText;
-    int                             m_activeInstance;
+    std::map<int, UIText>           m_instancesText;
+    int                             m_activeInstance;    
+
+    uint32_t                        m_rows;
+    uint32_t                        m_cols;
 
     WINDOW*                         m_window;
 };

@@ -1,5 +1,5 @@
 #include "Logger.h"
-
+#include "Common.h"
 
 namespace Logger
 {
@@ -10,6 +10,8 @@ namespace Logger
     {
         #if defined DEBUG
         g_logFile = std::ofstream("logs.txt");
+        EVALUATE(g_logFile.is_open(), false, ==, "Unable to open log file");
+        log("Log file opened successfully");
         #endif
     }
 

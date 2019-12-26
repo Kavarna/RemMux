@@ -13,6 +13,7 @@ namespace Logger
     {
         #if defined DEBUG
         g_logFile << arg;
+        g_logFile.flush();
         #endif
     }
 

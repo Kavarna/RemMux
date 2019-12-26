@@ -8,6 +8,9 @@ if (CMAKE_BUILD_TYPE MATCHES DEBUG)
     set(COMPILE_CONFIGURATION "debug")
 elseif (CMAKE_BUILD_TYPE MATCHES RELEASE)
 	set(COMPILE_CONFIGURATION "release")
+else()
+    add_definitions(-DDEBUG)
+    set(COMPILE_CONFIGURATION "debug")
 endif()
 
 

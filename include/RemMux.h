@@ -47,6 +47,8 @@ private:
 
     std::unique_ptr<UIHeader>   m_header;
 
+    bool                        m_windowMode = false;
+
     uint64_t                    m_flags;                        
 
 };

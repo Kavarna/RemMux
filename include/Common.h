@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <map>
 
 // Others
 #include "HighResolutionTimer.h"
