@@ -11,10 +11,10 @@ public:
     ~UIHeader();
 
 public:
-    void render(unsigned int);
+    void render(unsigned int framerate, int activateInstance);
     void resize(int rows, int cols);
 
-    void activateInstance(int index);
+    void addInstance(int index);
     void deleteInstance(int index);
 
 private:
@@ -25,8 +25,7 @@ private:
     UIText                          m_username;
     UIText                          m_time;
 
-    std::map<int, UIText>           m_instancesText;
-    int                             m_activeInstance;    
+    std::map<int, UIText>           m_instancesText; 
 
     uint32_t                        m_rows;
     uint32_t                        m_cols;

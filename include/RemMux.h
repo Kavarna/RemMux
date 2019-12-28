@@ -3,12 +3,26 @@
 
 #include "Common.h"
 #include "UIHeader.h"
+#include "Instance.h"
 
 class RemMux
 {
 
     static RemMux* m_instance;
 
+    template <typename type>
+    using Ptr = std::unique_ptr<type>;
+    struct InstanceInfo 
+    {
+        Ptr<Instance>   m_instance;
+        std::shared_ptr<Instance>   m_headerInstance;
+        std::shared_ptr<Instance>   m_belowInstance;
+        std::shared_ptr<Instance>   m_rightInstance;
+        std::shared_ptr<Instance>   m_leftInstance;
+
+        void resize(uint32_t rows, uint32_t cols);
+        void render();
+    };
 
 private:
     RemMux();
@@ -31,6 +45,8 @@ private:
     void initColors();
     void initComponents();
 
+    void updateLimits(InstanceInfo& info, uint32_t rows, uint32_t cols);
+
     // runtime
     void getUserInput();
     void resize();
@@ -46,6 +62,12 @@ private:
     float                       m_deltaTime;
 
     std::unique_ptr<UIHeader>   m_header;
+    
+    std::map<int, InstanceInfo> m_instances;
+    int                         m_activeInstance;
+
+
+
 
     bool                        m_windowMode = false;
 

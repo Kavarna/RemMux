@@ -14,6 +14,7 @@
 #include <string>
 #include <cmath>
 #include <map>
+#include <unordered_map>
 
 // Others
 #include "HighResolutionTimer.h"
@@ -71,3 +72,24 @@ struct Position
     int row;
     int col;
 };
+
+struct Size
+{
+    int rows;
+    int cols;
+};
+
+inline bool AABBCollide(const Position& pos1, const Size& size1,
+                 const Position& pos2, const Size& size2)
+{
+    if (pos1.row < pos2.row + size2.rows &&
+        pos1.row + size1.rows > pos2.row &&
+        pos1.col < pos2.col + size2.cols &&
+        pos1.col + size1.cols > pos2.col)
+    {
+        return true;
+    }
+
+    return false;
+}
+

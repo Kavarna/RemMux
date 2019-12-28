@@ -1,4 +1,5 @@
 #include "UIHeader.h"
+#include "Logger.h"
 
 
 std::string getCurrentTimeAsString()
@@ -27,7 +28,7 @@ UIHeader::~UIHeader()
     }
 }
 
-void UIHeader::render(unsigned int framerate)
+void UIHeader::render(unsigned int framerate, int activeInstance)
 {
     // Update stuff
     m_time.setText(getCurrentTimeAsString());
@@ -56,7 +57,7 @@ void UIHeader::render(unsigned int framerate)
 
     for (auto element : m_instancesText)
     {
-        if (element.first == m_activeInstance)
+        if (element.first == activeInstance)
         {
             wattr_on(m_window, COLOR_PAIR(COLOR_BLACK_LTGRAY_BACKGROUND), nullptr);
             element.second.render(m_window);
@@ -99,13 +100,12 @@ void UIHeader::resize(int rows, int cols)
     wresize(m_window, rows, cols);
 }
 
-void UIHeader::activateInstance(int index)
+void UIHeader::addInstance(int index)
 {
     if (m_instancesText.find(index) == m_instancesText.end())
     {
         m_instancesText.insert({index, UIText{}});
     }
-    m_activeInstance = index;
     updateInstancesText(m_rows, m_cols);
 }
 
