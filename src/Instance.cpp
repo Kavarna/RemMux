@@ -40,6 +40,10 @@ void Instance::render()
     {
         m_aboveInstance->render();
     }
+    if (m_leftInstance && !m_leftInstance->m_startedRendering)
+    {
+        m_leftInstance->render();
+    }
 
     if (m_active)
     {
@@ -57,6 +61,10 @@ void Instance::render()
     if (m_belowInstance && !m_belowInstance->m_startedRendering)
     {
         m_belowInstance->render();
+    }
+    if (m_rightInstance && !m_rightInstance->m_startedRendering)
+    {
+        m_rightInstance->render();
     }
 
     m_startedRendering = false;
@@ -199,6 +207,7 @@ std::shared_ptr<Instance> Instance::splitHorizontally()
             m_currentTerminalSize.cols
             );
     newInstance->m_rowsPercentage = m_rowsPercentage;
+    newInstance->m_colsPercentage = m_colsPercentage;
 
     newInstance->setLimits(
         shared_from_this(),
@@ -208,6 +217,41 @@ std::shared_ptr<Instance> Instance::splitHorizontally()
     );
 
     m_belowInstance = newInstance;
+    
+    newInstance->resize(m_currentTerminalSize.rows, m_currentTerminalSize.cols);
+
+    return newInstance;
+}
+
+std::shared_ptr<Instance> Instance::splitVertically()
+{
+    int initialCols = m_currentInstanceSize.cols;
+    m_currentInstanceSize.cols = m_currentInstanceSize.cols / 2;
+    m_colsPercentage *= 0.5f;
+
+    updateWindow();
+
+    int newWindowCols = initialCols - m_currentInstanceSize.cols;
+    int newWindowRows = m_currentInstanceSize.rows;
+    int newWindowPositionCol = m_currentInstancePosition.col + m_currentInstanceSize.cols;
+    int newWindowPositionRow = m_currentInstancePosition.row;
+    std::shared_ptr<Instance> newInstance = std::make_shared<Instance>(
+            Position{newWindowPositionRow, newWindowPositionCol},
+            Size{newWindowRows, newWindowCols},
+            m_currentTerminalSize.rows,
+            m_currentTerminalSize.cols
+            );
+    newInstance->m_colsPercentage = m_colsPercentage;
+    newInstance->m_rowsPercentage = m_rowsPercentage;
+
+    newInstance->setLimits(
+        m_aboveInstance,
+        m_rightInstance,
+        m_belowInstance,
+        shared_from_this()
+    );
+
+    m_rightInstance = newInstance;
     
     newInstance->resize(m_currentTerminalSize.rows, m_currentTerminalSize.cols);
 

@@ -269,13 +269,16 @@ void RemMux::getUserInput()
             {
                 Logger::log("Window mode enabled and \% pressed. Splitting current vertically window\n");
                 m_windowMode = false;
+                auto& ref = m_instances[m_activeInstance].m_instance;
+                ref->setActive(false);
+                ref = ref->splitVertically();
+                ref->setActive(true);
             }
         }
         else if (ch == 'D')
         {
             wclear(stdscr);
         }
-        mvwprintw(stdscr, 3, 0, "Pressed char = %d;       ", ch);
     }
 }
 

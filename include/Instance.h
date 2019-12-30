@@ -32,6 +32,7 @@ public:
     void setActive(bool active);
 
     std::shared_ptr<Instance> splitHorizontally();
+    std::shared_ptr<Instance> splitVertically();
 
     void updateWindow();
 
