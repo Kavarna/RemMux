@@ -275,6 +275,54 @@ void RemMux::getUserInput()
                 ref->setActive(true);
             }
         }
+        else if (ch == KEY_LEFT)
+        {
+            if (m_windowMode)
+            {
+                Logger::log("Left key pressed. Changing active window\n");
+                m_windowMode = false;
+                auto& ref = m_instances[m_activeInstance].m_instance;
+                ref->setActive(false);
+                ref = ref->getLeftWindow();
+                ref->setActive(true);
+            }
+        }
+        else if (ch == KEY_RIGHT)
+        {
+            if (m_windowMode)
+            {
+                Logger::log("Right key pressed. Changing active window\n");
+                m_windowMode = false;
+                auto& ref = m_instances[m_activeInstance].m_instance;
+                ref->setActive(false);
+                ref = ref->getRightWindow();
+                ref->setActive(true);
+            }
+        }
+        else if (ch == KEY_UP)
+        {
+            if (m_windowMode)
+            {
+                Logger::log("Up key pressed. Changing active window\n");
+                m_windowMode = false;
+                auto& ref = m_instances[m_activeInstance].m_instance;
+                ref->setActive(false);
+                ref = ref->getAboveWindow();
+                ref->setActive(true);
+            }
+        }
+        else if (ch == KEY_DOWN)
+        {
+            if (m_windowMode)
+            {
+                Logger::log("Down key pressed. Changing active window\n");
+                m_windowMode = false;
+                auto& ref = m_instances[m_activeInstance].m_instance;
+                ref->setActive(false);
+                ref = ref->getBelowWindow();
+                ref->setActive(true);
+            }
+        }
         else if (ch == 'D')
         {
             wclear(stdscr);

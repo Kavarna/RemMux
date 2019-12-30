@@ -7,7 +7,12 @@
 class Instance :
     public std::enable_shared_from_this<Instance>
 {
-
+    enum class SplitType
+    {
+        Vertical,
+        Horizontal,
+        NoneOfAbove = 0
+    };
 public:
     Instance(const Position& position,
              const Size& size,
@@ -33,6 +38,14 @@ public:
 
     std::shared_ptr<Instance> splitHorizontally();
     std::shared_ptr<Instance> splitVertically();
+    // Returns the new window or nullptr
+    // After using this method, this instance can be deleted (ie. .reset())
+    std::shared_ptr<Instance> deleteWindow();
+
+    std::shared_ptr<Instance> getAboveWindow();
+    std::shared_ptr<Instance> getBelowWindow();
+    std::shared_ptr<Instance> getLeftWindow();
+    std::shared_ptr<Instance> getRightWindow();
 
     void updateWindow();
 
@@ -59,6 +72,8 @@ private:
     std::shared_ptr<Instance> m_aboveInstance = nullptr;
     std::shared_ptr<Instance> m_belowInstance = nullptr;
 
+    std::shared_ptr<Instance> m_parent = nullptr;
+    SplitType m_splitType = SplitType::NoneOfAbove;
 };
 
 

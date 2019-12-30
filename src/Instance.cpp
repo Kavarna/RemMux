@@ -216,6 +216,9 @@ std::shared_ptr<Instance> Instance::splitHorizontally()
         m_leftInstance
     );
 
+    newInstance->m_parent = shared_from_this();
+    newInstance->m_splitType = Instance::SplitType::Horizontal;
+
     m_belowInstance = newInstance;
     
     newInstance->resize(m_currentTerminalSize.rows, m_currentTerminalSize.cols);
@@ -251,6 +254,9 @@ std::shared_ptr<Instance> Instance::splitVertically()
         shared_from_this()
     );
 
+    newInstance->m_parent = shared_from_this();
+    newInstance->m_splitType = Instance::SplitType::Vertical;
+
     m_rightInstance = newInstance;
     
     newInstance->resize(m_currentTerminalSize.rows, m_currentTerminalSize.cols);
@@ -269,4 +275,42 @@ void Instance::updateWindow()
 void Instance::setActive(bool active)
 {
     m_active = active;
+}
+
+std::shared_ptr<Instance> Instance::deleteWindow()
+{
+    return m_parent;
+}
+
+std::shared_ptr<Instance> Instance::getAboveWindow()
+{
+    if (m_aboveInstance && !m_aboveInstance->m_fixed)
+    {
+        return m_aboveInstance;
+    }
+    return nullptr;
+}
+std::shared_ptr<Instance> Instance::getBelowWindow()
+{
+    if (m_belowInstance && !m_belowInstance->m_fixed)
+    {
+        return m_belowInstance;
+    }
+    return nullptr;
+}
+std::shared_ptr<Instance> Instance::getLeftWindow()
+{
+    if (m_leftInstance && !m_leftInstance->m_fixed)
+    {
+        return m_leftInstance;
+    }
+    return nullptr;
+}
+std::shared_ptr<Instance> Instance::getRightWindow()
+{
+    if (m_rightInstance && !m_rightInstance->m_fixed)
+    {
+        return m_rightInstance;
+    }
+    return nullptr;
 }
