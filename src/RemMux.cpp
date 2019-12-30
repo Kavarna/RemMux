@@ -9,11 +9,11 @@ void RemMux::InstanceInfo::resize(uint32_t rows, uint32_t cols)
 {
     m_headerInstance->resize(rows, cols);
     m_headerInstance->setPosition({0,0});
-    m_headerInstance->setSize({(int)rows - 3, (int)cols});
+    m_headerInstance->setSize({(int) 3, (int)cols});
 
     m_leftInstance->resize(rows, cols);
-    m_leftInstance->setPosition({0, -3});
-    m_leftInstance->setSize({3, (int)cols});
+    m_leftInstance->setPosition({0, -2});
+    m_leftInstance->setSize({(int) rows, 2});
 
     m_rightInstance->resize(rows, cols);
     m_rightInstance->setPosition({0, (int) cols + 1});
@@ -167,8 +167,8 @@ void RemMux::initComponents()
     m_header = std::make_unique<UIHeader>(3, cols);
 
     InstanceInfo info;
-    info.m_instance = std::make_unique<Instance>(Position{3, 0},
-                                                Size{(int)rows - 3, (int)cols},
+    info.m_instance = std::make_shared<Instance>(Position{3, 0},
+                                                Size{(int)rows, (int)cols},
                                                 rows, cols);
     updateLimits(info, rows, cols);
     m_instances[1] = std::move(info);
@@ -180,12 +180,12 @@ void RemMux::initComponents()
 void RemMux::updateLimits(RemMux::InstanceInfo& info, uint32_t rows, uint32_t cols)
 {
     info.m_headerInstance = std::make_shared<Instance>(Position{0,0},
-                            Size{(int)rows - 3, (int)cols},
+                            Size{(int)3, (int)cols},
                             rows, cols);
     info.m_headerInstance->setFixed(true);
     info.m_headerInstance->setShouldRender(false);
 
-    info.m_leftInstance = std::make_shared<Instance>(Position{0, -3},
+    info.m_leftInstance = std::make_shared<Instance>(Position{0, -2},
                             Size{(int)rows, 2},
                             rows, cols);
     info.m_leftInstance->setFixed(true);
@@ -202,6 +202,13 @@ void RemMux::updateLimits(RemMux::InstanceInfo& info, uint32_t rows, uint32_t co
                             rows, cols);
     info.m_belowInstance->setFixed(true);
     info.m_belowInstance->setShouldRender(false);
+
+    info.m_instance->setLimits(
+        info.m_headerInstance,
+        info.m_rightInstance,
+        info.m_belowInstance,
+        info.m_leftInstance
+    );
 }
 
 void RemMux::getUserInput()
@@ -250,6 +257,10 @@ void RemMux::getUserInput()
             {
                 Logger::log("Window mode enabled and \" pressed. Splitting current horizontally window\n");
                 m_windowMode = false;
+                auto& ref = m_instances[m_activeInstance].m_instance;
+                ref->setActive(false);
+                ref = ref->splitHorizontally();
+                ref->setActive(true);
             }
         }
         else if (ch == '%')
@@ -259,6 +270,10 @@ void RemMux::getUserInput()
                 Logger::log("Window mode enabled and \% pressed. Splitting current vertically window\n");
                 m_windowMode = false;
             }
+        }
+        else if (ch == 'D')
+        {
+            wclear(stdscr);
         }
         mvwprintw(stdscr, 3, 0, "Pressed char = %d;       ", ch);
     }

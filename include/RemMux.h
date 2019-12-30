@@ -11,10 +11,10 @@ class RemMux
     static RemMux* m_instance;
 
     template <typename type>
-    using Ptr = std::unique_ptr<type>;
+    using Ptr = std::shared_ptr<type>;
     struct InstanceInfo 
     {
-        Ptr<Instance>   m_instance;
+        std::shared_ptr<Instance>   m_instance;
         std::shared_ptr<Instance>   m_headerInstance;
         std::shared_ptr<Instance>   m_belowInstance;
         std::shared_ptr<Instance>   m_rightInstance;

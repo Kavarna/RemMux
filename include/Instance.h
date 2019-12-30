@@ -4,7 +4,8 @@
 #include "Common.h"
 
 
-class Instance 
+class Instance :
+    public std::enable_shared_from_this<Instance>
 {
 
 public:
@@ -28,6 +29,11 @@ public:
 
     void setPosition(const Position& pos);
     void setSize(const Size& size);
+    void setActive(bool active);
+
+    std::shared_ptr<Instance> splitHorizontally();
+
+    void updateWindow();
 
 private:
     WINDOW* m_window;
@@ -38,8 +44,14 @@ private:
 
     Size m_currentTerminalSize;
 
+    bool m_startedRendering;
+    bool m_startedResizing;
+
     Position m_currentInstancePosition;
     Size m_currentInstanceSize;
+
+    float m_rowsPercentage = 1.0f;
+    float m_colsPercentage = 1.0f;
 
     std::shared_ptr<Instance> m_leftInstance = nullptr;
     std::shared_ptr<Instance> m_rightInstance = nullptr;

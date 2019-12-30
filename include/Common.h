@@ -15,6 +15,7 @@
 #include <cmath>
 #include <map>
 #include <unordered_map>
+#include <memory>
 
 // Others
 #include "HighResolutionTimer.h"
