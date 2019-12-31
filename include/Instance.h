@@ -50,6 +50,19 @@ public:
     void updateWindow();
 
 private:
+    void updateLeftLimit(std::shared_ptr<Instance> oldLimit,
+                         std::shared_ptr<Instance> newLimit);
+    void updateRightLimit(std::shared_ptr<Instance> oldLimit,
+                          std::shared_ptr<Instance> newLimit);
+    void updateAboveLimit(std::shared_ptr<Instance> oldLimit,
+                          std::shared_ptr<Instance> newLimit);
+    void updateBelowLimit(std::shared_ptr<Instance> oldLimit,
+                          std::shared_ptr<Instance> newLimit);
+    void rawUpdateLimit(std::shared_ptr<Instance> oldLimit,
+                        std::shared_ptr<Instance> newLimit);
+
+
+private:
     WINDOW* m_window;
 
     bool m_active;
@@ -74,6 +87,14 @@ private:
 
     std::shared_ptr<Instance> m_parent = nullptr;
     SplitType m_splitType = SplitType::NoneOfAbove;
+
+    std::vector<std::shared_ptr<Instance>> m_children;
+    
+    bool m_beginAboveUpdate = false;
+    bool m_beginBelowUpdate = false;
+    bool m_beginRightUpdate = false;
+    bool m_beginLeftUpdate = false;
+    bool m_beginRawUpdate = false;
 };
 
 

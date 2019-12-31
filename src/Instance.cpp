@@ -158,14 +158,60 @@ void Instance::setLimits(std::shared_ptr<Instance> up,
                          std::shared_ptr<Instance> down,
                          std::shared_ptr<Instance> left)
 {
-    m_aboveInstance = (up);
-    m_aboveInstance->m_belowInstance = shared_from_this();
-    m_rightInstance = (right);
-    m_rightInstance->m_leftInstance = shared_from_this();
-    m_belowInstance = (down);
-    m_belowInstance->m_aboveInstance = shared_from_this();
-    m_leftInstance = (left);
-    m_leftInstance->m_rightInstance = shared_from_this();
+    if (m_aboveInstance)
+    {
+        rawUpdateLimit(m_aboveInstance, up);
+    }
+    else
+    {
+        m_aboveInstance = up;
+    }
+    if (up)
+    {
+        up->rawUpdateLimit(m_aboveInstance->m_belowInstance, shared_from_this());
+    }
+
+
+    if (m_rightInstance)
+    {
+        rawUpdateLimit(m_rightInstance, right);
+    }
+    else
+    {
+        m_rightInstance = right;
+    }
+    if (right)
+    {
+        right->rawUpdateLimit(m_rightInstance->m_leftInstance, shared_from_this());
+    }
+
+
+    if (m_belowInstance)
+    {
+        rawUpdateLimit(m_belowInstance, down);
+    }
+    else
+    {
+        m_belowInstance = down;
+    }
+    if (down)
+    {
+        down->rawUpdateLimit(m_aboveInstance->m_belowInstance, shared_from_this());
+    }
+
+
+    if (m_leftInstance)
+    {
+        rawUpdateLimit(m_leftInstance, left);
+    }
+    else
+    {
+        m_leftInstance = left;
+    }
+    if (left)
+    {
+        left->rawUpdateLimit(m_leftInstance->m_rightInstance, shared_from_this());
+    }
 }
 
 void Instance::setShouldRender(bool shouldRender)
@@ -214,12 +260,17 @@ std::shared_ptr<Instance> Instance::splitHorizontally()
         m_rightInstance,
         m_belowInstance,
         m_leftInstance
-    );
+    ); 
 
     newInstance->m_parent = shared_from_this();
     newInstance->m_splitType = Instance::SplitType::Horizontal;
+    m_children.push_back(newInstance);
 
-    m_belowInstance = newInstance;
+
+    rawUpdateLimit(m_belowInstance, newInstance);
+    newInstance->m_belowInstance->updateAboveLimit(shared_from_this(), newInstance);
+    // newInstance->updateAboveLimit(newInstance->m_aboveInstance, shared_from_this());
+    newInstance->m_aboveInstance = shared_from_this();
     
     newInstance->resize(m_currentTerminalSize.rows, m_currentTerminalSize.cols);
 
@@ -256,8 +307,9 @@ std::shared_ptr<Instance> Instance::splitVertically()
 
     newInstance->m_parent = shared_from_this();
     newInstance->m_splitType = Instance::SplitType::Vertical;
-
-    m_rightInstance = newInstance;
+    m_children.push_back(newInstance);
+    
+    rawUpdateLimit(m_rightInstance, newInstance);
     
     newInstance->resize(m_currentTerminalSize.rows, m_currentTerminalSize.cols);
 
@@ -290,6 +342,7 @@ std::shared_ptr<Instance> Instance::getAboveWindow()
     }
     return nullptr;
 }
+
 std::shared_ptr<Instance> Instance::getBelowWindow()
 {
     if (m_belowInstance && !m_belowInstance->m_fixed)
@@ -298,6 +351,7 @@ std::shared_ptr<Instance> Instance::getBelowWindow()
     }
     return nullptr;
 }
+
 std::shared_ptr<Instance> Instance::getLeftWindow()
 {
     if (m_leftInstance && !m_leftInstance->m_fixed)
@@ -306,6 +360,7 @@ std::shared_ptr<Instance> Instance::getLeftWindow()
     }
     return nullptr;
 }
+
 std::shared_ptr<Instance> Instance::getRightWindow()
 {
     if (m_rightInstance && !m_rightInstance->m_fixed)
@@ -313,4 +368,108 @@ std::shared_ptr<Instance> Instance::getRightWindow()
         return m_rightInstance;
     }
     return nullptr;
+}
+
+void Instance::updateLeftLimit(std::shared_ptr<Instance> oldLimit,
+                               std::shared_ptr<Instance> newLimit)
+{
+    if (!m_beginLeftUpdate)
+    {
+        m_beginLeftUpdate = true;
+        if (m_parent)
+        {
+            m_parent->updateLeftLimit(oldLimit, newLimit);
+        }
+        for (auto& child : m_children)
+        {
+            child->updateLeftLimit(oldLimit, newLimit);
+        }
+        if (m_leftInstance == oldLimit)
+        {
+            m_leftInstance = newLimit;
+        }
+        m_beginLeftUpdate = false;
+    }
+}
+
+void Instance::updateRightLimit(std::shared_ptr<Instance> oldLimit,
+                                std::shared_ptr<Instance> newLimit)
+{
+    if (!m_beginRightUpdate)
+    {
+        m_beginRightUpdate = true;
+        if (m_parent)
+        {
+            m_parent->updateRightLimit(oldLimit, newLimit);
+        }
+        for (auto& child : m_children)
+        {
+            child->updateRightLimit(oldLimit, newLimit);
+        }
+        if (m_rightInstance == oldLimit)
+        {
+            m_rightInstance = newLimit;
+        }
+        m_beginRightUpdate = false;
+    }
+}
+
+void Instance::updateAboveLimit(std::shared_ptr<Instance> oldLimit,
+                                std::shared_ptr<Instance> newLimit)
+{
+    if (!m_beginAboveUpdate)
+    {
+        m_beginAboveUpdate = true;
+        if (m_parent)
+        {
+            m_parent->updateAboveLimit(oldLimit, newLimit);
+        }
+        for (auto& child : m_children)
+        {
+            child->updateAboveLimit(oldLimit, newLimit);
+        }
+        if (m_aboveInstance == oldLimit)
+        {
+            m_aboveInstance = newLimit;
+        }
+        m_beginAboveUpdate = false;
+    }
+}
+
+void Instance::updateBelowLimit(std::shared_ptr<Instance> oldLimit,
+                                std::shared_ptr<Instance> newLimit)
+{
+    if (!m_beginBelowUpdate)
+    {
+        m_beginBelowUpdate = true;
+        if (m_parent)
+        {
+            m_parent->updateBelowLimit(oldLimit, newLimit);
+        }
+        for (auto& child : m_children)
+        {
+            child->updateBelowLimit(oldLimit, newLimit);
+        }
+        if (m_belowInstance == oldLimit)
+        {
+            m_belowInstance = newLimit;
+        }
+        m_beginBelowUpdate = false;
+    }
+}
+
+void Instance::rawUpdateLimit(std::shared_ptr<Instance> oldLimit,
+                              std::shared_ptr<Instance> newLimit)
+{
+    if (!m_beginRawUpdate)
+    {
+        m_beginRawUpdate = true;
+
+        updateBelowLimit(oldLimit, newLimit);
+        updateAboveLimit(oldLimit, newLimit);
+        updateLeftLimit(oldLimit, newLimit);
+        updateRightLimit(oldLimit, newLimit);
+
+        m_beginRawUpdate = false;
+    }
 }

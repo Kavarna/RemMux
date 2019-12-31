@@ -283,8 +283,12 @@ void RemMux::getUserInput()
                 m_windowMode = false;
                 auto& ref = m_instances[m_activeInstance].m_instance;
                 ref->setActive(false);
-                ref = ref->getLeftWindow();
-                ref->setActive(true);
+                auto newActiveWindow = ref->getLeftWindow();
+                if (newActiveWindow)
+                {
+                    ref = newActiveWindow;
+                    ref->setActive(true);
+                }
             }
         }
         else if (ch == KEY_RIGHT)
@@ -295,8 +299,12 @@ void RemMux::getUserInput()
                 m_windowMode = false;
                 auto& ref = m_instances[m_activeInstance].m_instance;
                 ref->setActive(false);
-                ref = ref->getRightWindow();
-                ref->setActive(true);
+                auto newActiveWindow = ref->getRightWindow();
+                if (newActiveWindow)
+                {
+                    ref = newActiveWindow;
+                    ref->setActive(true);
+                }
             }
         }
         else if (ch == KEY_UP)
@@ -307,8 +315,12 @@ void RemMux::getUserInput()
                 m_windowMode = false;
                 auto& ref = m_instances[m_activeInstance].m_instance;
                 ref->setActive(false);
-                ref = ref->getAboveWindow();
-                ref->setActive(true);
+                auto newActiveWindow = ref->getAboveWindow();
+                if (newActiveWindow)
+                {
+                    ref = newActiveWindow;
+                    ref->setActive(true);
+                }
             }
         }
         else if (ch == KEY_DOWN)
@@ -319,8 +331,12 @@ void RemMux::getUserInput()
                 m_windowMode = false;
                 auto& ref = m_instances[m_activeInstance].m_instance;
                 ref->setActive(false);
-                ref = ref->getBelowWindow();
-                ref->setActive(true);
+                auto newActiveWindow = ref->getBelowWindow();
+                if (newActiveWindow)
+                {
+                    ref = newActiveWindow;
+                    ref->setActive(true);
+                }
             }
         }
         else if (ch == 'D')
