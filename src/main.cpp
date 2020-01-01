@@ -14,6 +14,7 @@ int main(int argc, const char *argv[])
 	{
 		Logger::log("Fatal error: ", e.what());
 		Logger::closeLogger();
+		std::cout << "Fatal error occured. Check logs.txt for more details.";
 		return 1;
 	}
 

@@ -115,7 +115,18 @@ void RemMux::parseArguments(int argc, const char *argv[])
             m_deltaTime = 2.0f / atoi(argv[i + 1]);
             ++i;
         }
+        else if (strcmp(argv[i], "-ip") == 0)
+        {
+            m_ip = argv[i + 1];
+            Logger::log("Selected ip: ", m_ip, "\n");
+        }
+        else if (strcmp(argv[i], "-port") == 0)
+        {
+            m_port = atoi(argv[i + 1]);
+            Logger::log("Selected port: ", m_port, "\n");
+        }
     }
+    EVALUATE(m_ip.size() != 0 && m_port != 0, false, ==, "IP:PORT invalid");
 }
 
 

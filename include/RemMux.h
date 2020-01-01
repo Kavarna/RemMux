@@ -67,7 +67,8 @@ private:
     int                         m_activeInstance;
 
 
-
+    std::string                 m_ip;
+    uint32_t                    m_port;
 
     bool                        m_windowMode = false;
 
