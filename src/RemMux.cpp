@@ -344,6 +344,7 @@ void RemMux::getUserInput()
             wclear(stdscr);
         }
     }
+
 }
 
 void RemMux::present()

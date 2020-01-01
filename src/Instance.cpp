@@ -158,60 +158,14 @@ void Instance::setLimits(std::shared_ptr<Instance> up,
                          std::shared_ptr<Instance> down,
                          std::shared_ptr<Instance> left)
 {
-    if (m_aboveInstance)
-    {
-        rawUpdateLimit(m_aboveInstance, up);
-    }
-    else
-    {
-        m_aboveInstance = up;
-    }
-    if (up)
-    {
-        up->rawUpdateLimit(m_aboveInstance->m_belowInstance, shared_from_this());
-    }
-
-
-    if (m_rightInstance)
-    {
-        rawUpdateLimit(m_rightInstance, right);
-    }
-    else
-    {
-        m_rightInstance = right;
-    }
-    if (right)
-    {
-        right->rawUpdateLimit(m_rightInstance->m_leftInstance, shared_from_this());
-    }
-
-
-    if (m_belowInstance)
-    {
-        rawUpdateLimit(m_belowInstance, down);
-    }
-    else
-    {
-        m_belowInstance = down;
-    }
-    if (down)
-    {
-        down->rawUpdateLimit(m_aboveInstance->m_belowInstance, shared_from_this());
-    }
-
-
-    if (m_leftInstance)
-    {
-        rawUpdateLimit(m_leftInstance, left);
-    }
-    else
-    {
-        m_leftInstance = left;
-    }
-    if (left)
-    {
-        left->rawUpdateLimit(m_leftInstance->m_rightInstance, shared_from_this());
-    }
+    m_aboveInstance = (up);
+    m_aboveInstance->m_belowInstance = std::make_shared<Instance>(*this);
+    m_rightInstance = (right);
+    m_rightInstance->m_leftInstance = std::make_shared<Instance>(*this);    
+    m_belowInstance = (down);
+    m_belowInstance->m_aboveInstance = std::make_shared<Instance>(*this);
+    m_leftInstance = (left);
+    m_leftInstance->m_rightInstance = std::make_shared<Instance>(*this);
 }
 
 void Instance::setShouldRender(bool shouldRender)
@@ -255,24 +209,25 @@ std::shared_ptr<Instance> Instance::splitHorizontally()
     newInstance->m_rowsPercentage = m_rowsPercentage;
     newInstance->m_colsPercentage = m_colsPercentage;
 
-    newInstance->setLimits(
-        shared_from_this(),
-        m_rightInstance,
-        m_belowInstance,
-        m_leftInstance
-    ); 
+    Logger::log("Split horizontal. Starting to iterate windows:\n");
+    iterateWindowsBeginWithThis([&](std::shared_ptr<Instance> ptr)
+    {
+        if (ptr->m_aboveInstance == shared_from_this())
+        {
+            Logger::log(*ptr, "\n");
+            ptr->m_aboveInstance = newInstance;
+        }
+    });
+
+    newInstance->m_aboveInstance = shared_from_this();
+    newInstance->m_rightInstance = m_rightInstance;
+    newInstance->m_belowInstance = m_belowInstance;
+    newInstance->m_leftInstance = m_leftInstance;
+    m_belowInstance = newInstance;
 
     newInstance->m_parent = shared_from_this();
     newInstance->m_splitType = Instance::SplitType::Horizontal;
     m_children.push_back(newInstance);
-
-
-    // rawUpdateLimit(m_belowInstance, newInstance);
-    // newInstance->m_belowInstance->updateAboveLimit(shared_from_this(), newInstance);
-    // newInstance->m_aboveInstance = shared_from_this();
-    m_belowInstance = newInstance;
-    // newInstance->m_belowInstance->m_aboveInstance = newInstance;
-    // newInstance->m_aboveInstance = shared_from_this();
     
     newInstance->resize(m_currentTerminalSize.rows, m_currentTerminalSize.cols);
 
@@ -299,25 +254,28 @@ std::shared_ptr<Instance> Instance::splitVertically()
             );
     newInstance->m_colsPercentage = m_colsPercentage;
     newInstance->m_rowsPercentage = m_rowsPercentage;
+    
+    Logger::log("Split vertical. Starting to iterate windows:\n");
+    iterateWindowsBeginWithThis([&](std::shared_ptr<Instance> ptr)
+    {
+        if (ptr->m_leftInstance == shared_from_this())
+        {
+            Logger::log(*ptr, "\n");
+            ptr->m_leftInstance = newInstance;
+        }
+    });
 
-    newInstance->setLimits(
-        m_aboveInstance,
-        m_rightInstance,
-        m_belowInstance,
-        shared_from_this()
-    );
+    newInstance->m_aboveInstance = m_aboveInstance;
+    newInstance->m_rightInstance = m_rightInstance;
+    newInstance->m_belowInstance = m_belowInstance;
+    newInstance->m_leftInstance = shared_from_this();
+
+    m_rightInstance = newInstance;
 
     newInstance->m_parent = shared_from_this();
     newInstance->m_splitType = Instance::SplitType::Vertical;
     m_children.push_back(newInstance);
-    
-    // rawUpdateLimit(m_rightInstance, newInstance);
-    // newInstance->m_rightInstance->updateLeftLimit(shared_from_this(), newInstance);
-    // newInstance->m_leftInstance = shared_from_this();
-    m_rightInstance = newInstance;
-    // newInstance->m_rightInstance->m_leftInstance = newInstance;
-    // newInstance->m_leftInstance = shared_from_this();
-    
+
     newInstance->resize(m_currentTerminalSize.rows, m_currentTerminalSize.cols);
 
     return newInstance;

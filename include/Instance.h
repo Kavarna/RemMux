@@ -49,6 +49,38 @@ public:
 
     void updateWindow();
 
+    template <typename function>
+    void iterateWindowsBeginWithThis(function fct)
+    {
+        if (m_beginIterate)
+            return;
+        m_beginIterate = true;
+        fct(shared_from_this());
+
+        if (m_parent)
+            m_parent->iterateWindowsBeginWithThis(fct);
+        for (auto& child : m_children)
+            child->iterateWindowsBeginWithThis(fct);
+
+        m_beginIterate = false;
+    }
+    // friend std::ostream& operator << (std::ostream& stream, const Instance& inst)
+    friend std::ostream& operator << (std::ostream& stream, const Instance& inst)
+    {
+        stream << "Window with position = (" <<
+                inst.m_currentInstancePosition.row << ", " << inst.m_currentInstancePosition.col <<
+                ") and size = (" << inst.m_currentInstanceSize.rows << ", " << inst.m_currentInstanceSize.cols <<
+                "); Percentages = (" << inst.m_rowsPercentage << ", " << inst.m_colsPercentage << "); ";
+        if (inst.m_fixed)
+            stream << "fixed window; ";
+        if (inst.m_shouldRender)
+            stream << "should render window; ";
+        if (inst.m_active)
+            stream << "active window;";
+
+        return stream;
+    }
+
 private:
     void updateLeftLimit(std::shared_ptr<Instance> oldLimit,
                          std::shared_ptr<Instance> newLimit);
@@ -95,6 +127,7 @@ private:
     bool m_beginRightUpdate = false;
     bool m_beginLeftUpdate = false;
     bool m_beginRawUpdate = false;
+    bool m_beginIterate = false;
 };
 
 
