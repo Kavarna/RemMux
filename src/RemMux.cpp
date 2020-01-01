@@ -282,10 +282,10 @@ void RemMux::getUserInput()
                 Logger::log("Left key pressed. Changing active window\n");
                 m_windowMode = false;
                 auto& ref = m_instances[m_activeInstance].m_instance;
-                ref->setActive(false);
                 auto newActiveWindow = ref->getLeftWindow();
                 if (newActiveWindow)
                 {
+                    ref->setActive(false);
                     ref = newActiveWindow;
                     ref->setActive(true);
                 }
@@ -298,10 +298,10 @@ void RemMux::getUserInput()
                 Logger::log("Right key pressed. Changing active window\n");
                 m_windowMode = false;
                 auto& ref = m_instances[m_activeInstance].m_instance;
-                ref->setActive(false);
                 auto newActiveWindow = ref->getRightWindow();
                 if (newActiveWindow)
                 {
+                    ref->setActive(false);
                     ref = newActiveWindow;
                     ref->setActive(true);
                 }
@@ -314,10 +314,10 @@ void RemMux::getUserInput()
                 Logger::log("Up key pressed. Changing active window\n");
                 m_windowMode = false;
                 auto& ref = m_instances[m_activeInstance].m_instance;
-                ref->setActive(false);
                 auto newActiveWindow = ref->getAboveWindow();
                 if (newActiveWindow)
                 {
+                    ref->setActive(false);
                     ref = newActiveWindow;
                     ref->setActive(true);
                 }
@@ -330,10 +330,10 @@ void RemMux::getUserInput()
                 Logger::log("Down key pressed. Changing active window\n");
                 m_windowMode = false;
                 auto& ref = m_instances[m_activeInstance].m_instance;
-                ref->setActive(false);
                 auto newActiveWindow = ref->getBelowWindow();
                 if (newActiveWindow)
                 {
+                    ref->setActive(false);
                     ref = newActiveWindow;
                     ref->setActive(true);
                 }

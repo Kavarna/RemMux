@@ -267,9 +267,12 @@ std::shared_ptr<Instance> Instance::splitHorizontally()
     m_children.push_back(newInstance);
 
 
-    rawUpdateLimit(m_belowInstance, newInstance);
-    newInstance->m_belowInstance->updateAboveLimit(shared_from_this(), newInstance);
-    newInstance->m_aboveInstance = shared_from_this();
+    // rawUpdateLimit(m_belowInstance, newInstance);
+    // newInstance->m_belowInstance->updateAboveLimit(shared_from_this(), newInstance);
+    // newInstance->m_aboveInstance = shared_from_this();
+    m_belowInstance = newInstance;
+    // newInstance->m_belowInstance->m_aboveInstance = newInstance;
+    // newInstance->m_aboveInstance = shared_from_this();
     
     newInstance->resize(m_currentTerminalSize.rows, m_currentTerminalSize.cols);
 
@@ -308,9 +311,12 @@ std::shared_ptr<Instance> Instance::splitVertically()
     newInstance->m_splitType = Instance::SplitType::Vertical;
     m_children.push_back(newInstance);
     
-    rawUpdateLimit(m_rightInstance, newInstance);
-    newInstance->m_rightInstance->updateLeftLimit(shared_from_this(), newInstance);
-    newInstance->m_leftInstance = shared_from_this();
+    // rawUpdateLimit(m_rightInstance, newInstance);
+    // newInstance->m_rightInstance->updateLeftLimit(shared_from_this(), newInstance);
+    // newInstance->m_leftInstance = shared_from_this();
+    m_rightInstance = newInstance;
+    // newInstance->m_rightInstance->m_leftInstance = newInstance;
+    // newInstance->m_leftInstance = shared_from_this();
     
     newInstance->resize(m_currentTerminalSize.rows, m_currentTerminalSize.cols);
 
