@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/wait.h>
 
 // C
 #include <string.h>
@@ -61,6 +62,9 @@
 #ifndef CTRL
 #define CTRL(c) ((c) & 037)
 #endif
+
+#define STDIN                               0
+#define STDOUT                              1
 
 
 #define THROW_ERROR(...) {char message[1024];\
