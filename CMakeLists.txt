@@ -19,13 +19,6 @@ include_directories(include)
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
 
-add_executable(RemMux
-        src/HighResolutionTimer.cpp
-        src/RemMux.cpp
-        src/UIHeader.cpp
-        src/UIText.cpp
-        src/Logger.cpp
-        src/Instance.cpp
-        src/main.cpp)
+add_subdirectory(client)
+add_subdirectory(server)
 
-target_link_libraries(RemMux ${CURSES_LIBRARIES})

@@ -1,4 +1,4 @@
-#include "Logger.h"
+#include "ServerLogger.h"
 #include "Common.h"
 
 namespace Logger
@@ -6,12 +6,12 @@ namespace Logger
 
     std::ofstream g_logFile;
 
-    void initLogger()
+    void initLogger(const std::string& filename)
     {
         #if defined DEBUG
-        g_logFile = std::ofstream("logs.txt");
+        g_logFile = std::ofstream(filename.c_str());
         EVALUATE(g_logFile.is_open(), false, ==, "Unable to open log file");
-        log("Log file opened successfully");
+        log("Log file opened successfully\n");
         #endif
     }
 

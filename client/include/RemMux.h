@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "UIHeader.h"
 #include "Instance.h"
+#include "HighResolutionTimer.h"
 
 class RemMux
 {

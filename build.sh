@@ -6,5 +6,6 @@ cmake --build Bin
 
 rm -r ./Executable/
 mkdir Executable
-cp ./Bin/RemMux ./Executable/
+cp ./Bin/client/RemMux ./Executable/
+cp ./Bin/server/RemMuxServer ./Executable/
 

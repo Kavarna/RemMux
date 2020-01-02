@@ -5,9 +5,15 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 // C
 #include <string.h>
+#include <errno.h>
+#include <stdio.h>
 
 // C++ std
 #include <vector>
@@ -18,9 +24,6 @@
 #include <memory>
 #include <algorithm>
 #include <iostream>
-
-// Others
-#include "HighResolutionTimer.h"
 
 
 #define COLOR_LTGRAY                        8
@@ -69,6 +72,7 @@ if ( value op decltype(value)(expected_result) )\
     THROW_ERROR(__VA_ARGS__);\
 }
 
+using Socket = int;
 
 struct Position
 {
