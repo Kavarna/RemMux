@@ -93,10 +93,10 @@ int SendMessage(Socket clientSocket, std::string message)
 
 
 
-void clientCommunication(Socket clientSocket)
+void clientCommunication(Socket clientSocket, int numClient)
 {
     Logger::closeLogger();
-    Logger::initLogger(std::string("client") + std::to_string(clientSocket) + ".logs");
+    Logger::initLogger(std::string("client") + std::to_string(numClient) + ".logs");
     std::string exitMessage = "EXIT";
     int magic = 0xBEE;
     int receivedMagic;
@@ -192,6 +192,7 @@ int main(int argc, const char* argv[])
             "Unale to make listen socket listen");
     Logger::log("Listening socket ready to accept ", maxCachedConnections, " connections\n");
 
+    int numClient = 0;
     while (true)
     {
         Socket clientSocket;
@@ -200,18 +201,17 @@ int main(int argc, const char* argv[])
         Logger::log("Waiting for connections.\n");
         EVALUATE(clientSocket = accept(listenSocket, (sockaddr*)&clientInfo, &length),
                 0, <, "Error while accepting client");
-        
-        // if (fork() == 0)
-        // {
-        //     close(listenSocket);
-        //     clientCommunication(clientSocket);
-        //     return;
-        // }
-        // else
-        // {
-        //     close(clientSocket);
-        // }
-        clientCommunication(clientSocket);
+        numClient++;
+        if (fork() == 0)
+        {
+            close(listenSocket);
+            clientCommunication(clientSocket, numClient);
+            return 0;
+        }
+        else
+        {
+            close(clientSocket);
+        }
     }
 
     Logger::log("Closing listening socket\n");
