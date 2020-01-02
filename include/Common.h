@@ -24,6 +24,7 @@
 #include <memory>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
 
 #define COLOR_LTGRAY                        8
