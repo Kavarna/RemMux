@@ -48,6 +48,10 @@ private:
 
     void updateLimits(InstanceInfo& info, uint32_t rows, uint32_t cols);
 
+    InstanceInfo createInstanceInfo(uint32_t rows, uint32_t cols);
+
+    void activateInstance(int index, uint32_t rows, uint32_t cols);
+
     // runtime
     void getUserInput();
     void resize();

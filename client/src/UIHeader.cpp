@@ -113,6 +113,7 @@ void UIHeader::deleteInstance(int index)
 {
     m_instancesText.erase(index);
     updateInstancesText(m_rows, m_cols);
+    wclear(m_window);
 }
 
 void UIHeader::updateInstancesText(uint32_t rows, uint32_t cols)

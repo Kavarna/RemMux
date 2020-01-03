@@ -167,6 +167,27 @@ void RemMux::initColors()
     init_pair(15, COLOR_BLACK,  COLOR_GRAY);
 }
 
+RemMux::InstanceInfo RemMux::createInstanceInfo(uint32_t rows, uint32_t cols)
+{
+    InstanceInfo info;
+    info.m_instance = std::make_shared<Instance>(Position{3, 0},
+                                                Size{(int)rows, (int)cols},
+                                                rows, cols);
+    updateLimits(info, rows, cols);
+    info.m_instance->resize(rows, cols);
+    return info;
+}
+
+void RemMux::activateInstance(int index, uint32_t rows, uint32_t cols)
+{
+    if (m_instances.find(index) == m_instances.end())
+    { // instance not found, create a new one and move to m_instances
+        m_instances[index] = std::move(createInstanceInfo(rows, cols));
+    }
+    m_header->addInstance(index);
+
+    m_activeInstance = index;
+}
 
 void RemMux::initComponents()
 {
@@ -176,16 +197,8 @@ void RemMux::initComponents()
     getmaxyx(stdscr, rows, cols);
 
     m_header = std::make_unique<UIHeader>(3, cols);
-
-    InstanceInfo info;
-    info.m_instance = std::make_shared<Instance>(Position{3, 0},
-                                                Size{(int)rows, (int)cols},
-                                                rows, cols);
-    updateLimits(info, rows, cols);
-    m_instances[1] = std::move(info);
-    m_header->addInstance(1);
-                           
-    m_activeInstance = 1;
+                        
+    activateInstance(1, rows, cols);
 }
 
 void RemMux::updateLimits(RemMux::InstanceInfo& info, uint32_t rows, uint32_t cols)
@@ -224,6 +237,8 @@ void RemMux::updateLimits(RemMux::InstanceInfo& info, uint32_t rows, uint32_t co
 
 void RemMux::getUserInput()
 {
+    uint32_t rows, cols;
+    getmaxyx(stdscr, rows, cols);
     while (true)
     {
         int ch;
@@ -236,9 +251,9 @@ void RemMux::getUserInput()
         {
             if (KEY_F(i) == ch)
             {
-                m_activeInstance = i;
-                m_header->addInstance(i);
+                activateInstance(i, rows, cols);
                 Logger::log("F", i, " pressed.\n");
+                resize();
                 break;
             }
         }
@@ -246,6 +261,7 @@ void RemMux::getUserInput()
         { // Remove current instance
             Logger::log("CTRL + x pressed. Deleting instance", m_activeInstance, ". ");
             m_header->deleteInstance(m_activeInstance);
+            m_instances.erase(m_activeInstance);
             for (const auto& elem : m_instances)
             {
                 m_activeInstance = elem.first;
