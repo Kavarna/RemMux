@@ -11,11 +11,17 @@ Instance::Instance(const Position& position,
 {
     m_window = newwin(size.rows, size.cols,
                 position.row, position.col);
+    scrollok(m_window, true);
+    idlok(m_window, true);
     m_active = true;
     m_shouldRender = true;
     m_fixed = false;
     m_startedRendering = false;
     m_startedResizing = false;
+
+    m_cwd = g_startWorkingDirectory;
+    printStartCommand();
+
     resize(rows, cols);
 }
 
@@ -48,15 +54,14 @@ void Instance::render()
     if (m_active)
     {
         wattr_on(m_window, COLOR_PAIR(COLOR_GREEN_BLACK_BACKGROUND), nullptr);
-        box(m_window, 0, 0);
+    }
+    updateWindow();
+    wrefresh(m_window);
+
+    if (m_active)
+    {
         wattr_off(m_window, COLOR_PAIR(COLOR_GREEN_BLACK_BACKGROUND), nullptr);
     }
-    else
-    {
-        box(m_window, 0, 0);
-    }
-
-    wrefresh(m_window);
 
     if (m_belowInstance && !m_belowInstance->m_startedRendering)
     {
@@ -286,12 +291,24 @@ void Instance::updateWindow()
     mvwin(m_window, m_currentInstancePosition.row, m_currentInstancePosition.col);
     wresize(m_window, m_currentInstanceSize.rows, m_currentInstanceSize.cols);
     wclear(m_window);
+
+    wmove(m_window, 0, 0);
+    sendStringNotSave(m_cache);
+    sendStringNotSave(m_command);
+
     wrefresh(m_window);
 }
 
 void Instance::setActive(bool active)
 {
     m_active = active;
+    if (m_active)
+    {
+        iterateWindowsBeginWithThis([](std::shared_ptr<Instance> wnd)
+        {
+            wnd->updateWindow();
+        });
+    }
 }
 
 std::shared_ptr<Instance> Instance::deleteWindow()
@@ -437,4 +454,148 @@ void Instance::rawUpdateLimit(std::shared_ptr<Instance> oldLimit,
 
         m_beginRawUpdate = false;
     }
+}
+
+void Instance::sendChar(char ch)
+{
+    sendCharNotSave(ch);
+
+    if (ch == '\n')
+    {
+        sendStringAndSave(m_command + "\n");
+        // Send and receive output
+        executeCommand();
+        printStartCommand();
+        m_command = "";
+    }
+    else
+    {
+        m_command.push_back(ch);
+    }
+}
+
+void Instance::sendStringAndSave(const std::string& str)
+{
+    for (const auto ch : str)
+    {
+        sendCharAndSave(ch);
+    }
+}
+
+void Instance::printStartCommand()
+{
+    sendStringAndSave(m_cwd + std::string("->"));
+}
+
+void Instance::sendCharAndSave(char ch)
+{
+    waddch(m_window, ch);
+
+    m_cache.push_back(ch);
+    if (m_cache.size() > maxCacheSize)
+    {
+        m_cache.erase(m_cache.begin(), m_cache.begin() + 1);
+    }
+}
+
+void Instance::sendCharNotSave(char ch)
+{
+    waddch(m_window, ch);
+}
+
+void Instance::sendStringNotSave(const std::string& str)
+{
+    for (const auto ch : str)
+    {
+        sendCharNotSave(ch);
+    }
+}
+
+void Instance::removeLastChar()
+{
+    if (m_command.size() > 0)
+    {
+        m_command.pop_back();
+    }
+}
+
+void Instance::executeCommand()
+{
+    m_available = false;
+
+    //std::async(std::launch::async, [&]
+    //{
+        executeSpecificCommand(m_command);
+        m_available = true;
+    //});
+}
+
+void Instance::executeSpecificCommand(const std::string& m_command)
+{
+    if (m_command == "cd")
+    {
+        m_cwd = g_startWorkingDirectory;
+    }
+    else if (m_command.find("cd ") == 0)
+    {
+        uint32_t startDirPos = 0;
+        for (uint32_t i = 2; i < m_command.size(); ++i)
+        {
+            if (m_command[i] != ' ')
+            {
+                startDirPos = i;
+                break;
+            }
+        }
+        if (startDirPos == 0)
+        {
+            m_cwd = g_startWorkingDirectory;
+        }
+        else
+        {
+            auto res = m_command.find_last_of("../");
+            if (res == startDirPos + 2)
+            {
+                uint32_t pos = m_cwd.find_last_of('/');
+                m_cwd.erase(m_cwd.begin() + pos, m_cwd.end());
+            }
+            else
+            {
+                // if [ -d "/hfasfsaome" ]; then echo "TRUE"; else echo "FALSE"; fi
+                SendMessage(g_clientSocket, "if [ -d \"" +
+                        std::string(m_command.c_str()+ startDirPos) +
+                        "\" ]; then echo \"TRUE\"; else echo \"FALSE\"; fi");
+                SendMessage(g_clientSocket, m_cwd);
+
+                std::string result;
+                ReadMessage(g_clientSocket, result);
+
+                if (result.compare(0, strlen("TRUE"), "TRUE") == 0)
+                {
+                    if (m_command[startDirPos] == '/')
+                    {
+                        m_cwd = std::string(m_command.c_str() + startDirPos);
+                    }
+                    else
+                    {
+                        m_cwd = m_cwd + "/" + std::string(m_command.c_str() + startDirPos);
+                    }
+                }
+                else
+                {
+                    sendStringAndSave("Invalid path\n");
+                }
+            }
+            
+        }
+    }
+    else
+    {
+        SendMessage(g_clientSocket, m_command);
+        SendMessage(g_clientSocket, m_cwd);
+        std::string response;
+        ReadMessage(g_clientSocket, response);
+        sendStringAndSave(response);
+    }
+    
 }

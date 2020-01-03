@@ -2,6 +2,8 @@
 
 
 #include "Common.h"
+#include "Globals.h"
+#include "Networks.h"
 
 
 class Instance :
@@ -13,6 +15,7 @@ class Instance :
         Horizontal,
         NoneOfAbove = 0
     };
+    static constexpr const uint32_t maxCacheSize = 2048;
 public:
     Instance(const Position& position,
              const Size& size,
@@ -35,6 +38,9 @@ public:
     void setPosition(const Position& pos);
     void setSize(const Size& size);
     void setActive(bool active);
+    
+    void sendChar(char ch);
+    void removeLastChar();
 
     std::shared_ptr<Instance> splitHorizontally();
     std::shared_ptr<Instance> splitVertically();
@@ -93,6 +99,15 @@ private:
     void rawUpdateLimit(std::shared_ptr<Instance> oldLimit,
                         std::shared_ptr<Instance> newLimit);
 
+    void printStartCommand();
+    void sendCharAndSave(char ch);
+    void sendCharNotSave(char ch);
+    void sendStringNotSave(const std::string& str);
+    void sendStringAndSave(const std::string& string);
+
+    void executeCommand();
+
+    void executeSpecificCommand(const std::string& command);
 
 private:
     WINDOW* m_window;
@@ -128,6 +143,14 @@ private:
     bool m_beginLeftUpdate = false;
     bool m_beginRawUpdate = false;
     bool m_beginIterate = false;
+
+    std::string m_cache;
+    std::string m_cwd;
+
+    std::string m_command;
+
+    bool m_available = true;
+
 };
 
 

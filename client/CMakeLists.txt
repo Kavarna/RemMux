@@ -14,6 +14,7 @@ add_executable(RemMux
         src/UIText.cpp
         src/Logger.cpp
         src/Instance.cpp
+        src/Globals.cpp
         src/main.cpp)
 
 target_link_libraries(RemMux ${CURSES_LIBRARIES})

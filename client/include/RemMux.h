@@ -5,6 +5,8 @@
 #include "UIHeader.h"
 #include "Instance.h"
 #include "HighResolutionTimer.h"
+#include "Globals.h"
+#include "Networks.h"
 
 class RemMux
 {
@@ -51,6 +53,7 @@ private:
     InstanceInfo createInstanceInfo(uint32_t rows, uint32_t cols);
 
     void activateInstance(int index, uint32_t rows, uint32_t cols);
+    void handShakeWithServer();
 
     // runtime
     void getUserInput();

@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <future>
 
 
 #define COLOR_LTGRAY                        8
@@ -56,6 +57,9 @@
 #define MAX_INSTANCE_NAME                   8
 #define MAX_FRAMERATE_LENGTH                2
 
+
+#define MIN_ASCII                           0
+#define MAX_ASCII                           255
 
 #define FLAG_RESIZE                         0
 

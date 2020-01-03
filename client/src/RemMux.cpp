@@ -78,13 +78,12 @@ RemMux::RemMux()
     Logger::log("App started.\n");
     initCurses();
     initColors();
-    initComponents();
-    resize();
 }
 
 
 RemMux::~RemMux()
 {
+    close(g_clientSocket);
     endwin();
 }
 
@@ -92,6 +91,8 @@ RemMux::~RemMux()
 int RemMux::run(int argc, const char *argv[])
 {
     parseArguments(argc, argv);
+    initComponents();
+    resize();
 
     while (true)
     {
@@ -127,6 +128,8 @@ void RemMux::parseArguments(int argc, const char *argv[])
         }
     }
     EVALUATE(m_ip.size() != 0 && m_port != 0, false, ==, "IP:PORT invalid");
+
+    handShakeWithServer();
 }
 
 
@@ -183,6 +186,7 @@ void RemMux::activateInstance(int index, uint32_t rows, uint32_t cols)
     if (m_instances.find(index) == m_instances.end())
     { // instance not found, create a new one and move to m_instances
         m_instances[index] = std::move(createInstanceInfo(rows, cols));
+        m_instances[index].m_instance->setActive(true);
     }
     m_header->addInstance(index);
 
@@ -197,7 +201,7 @@ void RemMux::initComponents()
     getmaxyx(stdscr, rows, cols);
 
     m_header = std::make_unique<UIHeader>(3, cols);
-                        
+
     activateInstance(1, rows, cols);
 }
 
@@ -245,8 +249,7 @@ void RemMux::getUserInput()
         ch = getch();
         if (ch == ERR)
             break;
-        if (ch == '\n')
-            break;
+        Logger::log("Keylog: \"", (char)ch, "\" as int ", ch, "\n");
         for (int i = 1; i <= 9; ++i)
         {
             if (KEY_F(i) == ch)
@@ -366,9 +369,17 @@ void RemMux::getUserInput()
                 }
             }
         }
-        else if (ch == 'D')
+        else if (ch == CTRL('D'))
         {
             wclear(stdscr);
+        }
+        else if (ch >= MIN_ASCII && ch <= MAX_ASCII)
+        {
+            m_instances[m_activeInstance].m_instance->sendChar(ch);
+        }
+        else if (ch == KEY_BACKSPACE)
+        {
+            m_instances[m_activeInstance].m_instance->removeLastChar();
         }
     }
 
@@ -381,6 +392,24 @@ void RemMux::present()
     
     m_header->render(m_timer.getPeriodCount(), m_activeInstance);
     m_instances[m_activeInstance].render();
+}
+
+void RemMux::handShakeWithServer()
+{
+    struct sockaddr_in server; 
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = inet_addr(m_ip.c_str());
+    server.sin_port = htons(m_port);
+
+    EVALUATE(g_clientSocket = socket(AF_INET, SOCK_STREAM, 0),
+            -1, ==, "Unable to create socket()");
+
+    EVALUATE(connect(g_clientSocket, (struct sockaddr*)&server, sizeof(struct sockaddr)),
+            -1, ==, "Unable to connect");
+
+    int magic = 0xBEE;
+    write(g_clientSocket, &magic, sizeof(magic));
+    ReadMessage(g_clientSocket, g_startWorkingDirectory);
 }
 
 void RemMux::schedule(uint32_t flag)

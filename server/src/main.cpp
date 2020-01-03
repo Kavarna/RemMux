@@ -106,15 +106,20 @@ void clientCommunication(Socket clientSocket, int numClient)
         SendMessage(clientSocket, exitMessage);
         return;
     }
+    char cwdPath[MAX_ASCII] = "/";
+    std::string cwd;
     Logger::log("Magic confirmed. Started serving the client\n");
+    getcwd(cwdPath, MAX_ASCII);
+    Logger::log("Sending CWD = \"", cwd, "\"");
+    cwd = std::string(cwdPath);
+    SendMessage(clientSocket, cwd);
 
     while (true)
     {
         Logger::log("Waiting for message\n");
         int messageSize;
         std::string command;
-        std::string cwd;
-
+        cwd = std::string(); // clear the cwd
         try
         {
             if (ReadMessage(clientSocket, command))
