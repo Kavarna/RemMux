@@ -100,8 +100,15 @@ int RemMux::run(int argc, const char *argv[])
         m_timer.waitSeconds(m_deltaTime - m_timer.timeSinceLastFrame());
         m_timer.update();
 
-        getUserInput();
-        present();
+        if (getUserInput())
+        {
+            present();
+        }
+        else
+        {
+            break;
+        }
+        
     }
 
 }
@@ -239,7 +246,7 @@ void RemMux::updateLimits(RemMux::InstanceInfo& info, uint32_t rows, uint32_t co
     );
 }
 
-void RemMux::getUserInput()
+bool RemMux::getUserInput()
 {
     uint32_t rows, cols;
     getmaxyx(stdscr, rows, cols);
@@ -274,6 +281,7 @@ void RemMux::getUserInput()
             if (m_instances.size() == 0)
             {
                 Logger::log("Application should close since there are no active instances.\n");
+                return false;
             }
         }
         else if (ch == CTRL('b'))
@@ -382,7 +390,7 @@ void RemMux::getUserInput()
             m_instances[m_activeInstance].m_instance->removeLastChar();
         }
     }
-
+    return true;
 }
 
 void RemMux::present()

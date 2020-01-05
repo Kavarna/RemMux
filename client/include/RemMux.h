@@ -56,7 +56,7 @@ private:
     void handShakeWithServer();
 
     // runtime
-    void getUserInput();
+    bool getUserInput();
     void resize();
     void present();
 
